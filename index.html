@@ -292,7 +292,6 @@ details.why summary:hover,details.rule summary:hover{color:var(--brass-deep)}
     <div class="kicker">FINDING YOUR WAY TO A HOME</div>
     <h1>Find what housing help you actually qualify for</h1>
     <p class="sub">Free, and it takes about two minutes. Answer a few questions about your situation. You'll get a plain-English list of the schemes worth applying for, and what you'll need to gather for each.</p>
-    <p class="sub" style="margin-top:.3rem"><a href="#" data-notice="end">Got a notice from your landlord? Check it</a></p>
   </header>
 
   <div class="progress" id="progress"></div>
@@ -2203,7 +2202,7 @@ function addFeedbackBlock(out){
 function addFooterCTA(out){
   addCouncilBox(out);
   addPlanBox(out);
-  if(state.situation==='renting'||state.situation==='homeless'){ const nb=document.createElement('div'); nb.className='flag'; nb.innerHTML='<h3>Got a notice from your landlord?</h3><p>Check a notice to leave or a rent increase against the current rules, and see the deadline to dispute it.</p><p><a href="#" data-notice="end">Check a notice to leave</a> · <a href="#" data-notice="rent">Check a rent increase</a></p>'; out.appendChild(nb); }
+  /* notice box removed 27 Oct */
   const div = document.createElement('div');
   div.className = 'flag';
   div.style.borderColor = 'var(--brass)';
