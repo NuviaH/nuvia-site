@@ -4481,11 +4481,11 @@ async function fillHag(PDFLib, pdfBytes, d){
   if(d.prev[0]) tick(19); if(d.prev[1]) tick(20); if(d.prev[2]) tick(21);
   yn('1', d.carer); if(d.carer === 'yes'){ text('20203027', d.carerName, 'Carer’s name'); text('20203023', d.carerRel, 'Carer’s relationship'); }
   text('20203028', money(d.rent), 'Monthly rent or mortgage', true); text('20203029', money(d.rentGov), 'Government part of rent or mortgage', true);
-  yn('2', d.resid); if(d.resid === 'yes'){ text('20203031', d.residName, 'Name of person in residential care'); text('20203030', d.residRel, 'Their relationship'); text('20203034', d.residHow, 'How long in residential care', true); text('20203032', money(d.residCost), 'Monthly cost of residential care', true); }
+  yn('2', d.resid); if(d.resid === 'yes'){ text('20203031', d.residName, 'Name of person in residential care'); text('20203030', d.residRel, 'Their relationship'); text('20203034', d.residHow, 'How long in residential care'); text('20203032', money(d.residCost), 'Monthly cost of residential care', true); }
   // page 12
-  yn('3', d.hc); if(d.hc === 'yes'){ text('20203037', d.hcName, 'Name of person getting homecare'); text('20203036', d.hcRel, 'Their relationship'); text('20203035', d.hcHow, 'How long getting homecare', true); text('20203033', money(d.hcCost), 'Monthly cost of homecare', true); }
+  yn('3', d.hc); if(d.hc === 'yes'){ text('20203037', d.hcName, 'Name of person getting homecare'); text('20203036', d.hcRel, 'Their relationship'); text('20203035', d.hcHow, 'How long getting homecare'); text('20203033', money(d.hcCost), 'Monthly cost of homecare', true); }
   if(d.diff === 'yes'){ text('20203043', d.oname, 'Owner’s name'); text('20203042', d.oaddr, 'Address of the home'); text('20203041', d.oeir, 'Eircode of the home'); }
-  text('20203040', d.howLong, 'How long living there', true);
+  text('20203040', d.howLong, 'How long living there');
   yn('4', d.liveAfter); if(d.liveAfter === 'no') warnings.push('The person the grant is for must be living in the home when the work is done. This is a condition of the grant.');
   radio('5', ['you','family','landlord','ahb'].indexOf(d.owner)); if(!d.owner) missing.push('Who owns the home (page 12)');
   yn('44', d.build); radio('6', ['det','semi','terr','apt'].indexOf(d.type)); yn('7', d.new12);
@@ -4493,10 +4493,11 @@ async function fillHag(PDFLib, pdfBytes, d){
   yn('8', d.lpt); if(d.lpt === 'no') warnings.push('Local Property Tax must be up to date, or deferred or exempt, before the council can pay the grant.'); if(!d.lpt) missing.push('Whether Local Property Tax is up to date (page 13)');
   const RM = {ubed:'20203044', ubath:'20203045', uliv:'20203046', udin:'20203047', ukit:'20203048', uoth:'20203049', dbed:'20203050', dbath:'20203053', dliv:'20203051', ddin:'20203054', dkit:'20203052', doth:'20203055'};
   Object.entries(RM).forEach(([k,n])=>text(n, d.rooms[k], 'Rooms', true));
-  text('20203056', d.works, 'The work you want done', true); if(!d.works) missing.push('The work you want done (page 13)');
+  text('20203056', d.works, 'The work you want done'); if(!d.works) missing.push('The work you want done (page 13)');
   text('20203038', money(d.cost), 'Estimated cost', true); if(!d.cost) missing.push('The estimated cost of the work (page 13)');
   yn('9', d.payExtra);
   text('202030123', d.smoke, 'Smoke alarms', true); text('20203058', d.co, 'Carbon monoxide alarms', true);
+  if(d.smoke !== '' && grNum(d.smoke) < 2) warnings.push('If the grant is approved, the home will need at least two smoke or heat alarms with 10-year batteries, and a carbon monoxide alarm if you heat with gas, oil, coal or another fossil fuel.');
   // page 14: income
   const IN = [['20203059','20203075','20203080','20203085','20203090'],['20203071','20203076','20203081','20203086','20203091'],['20203072','20203078','20203083','20203088','20203093'],['20203073','20203077','20203082','20203087','20203092'],['20203074','20203079','20203084','20203089','20203094'],['202030110','202030119','202030120','202030121','202030122']];
   d.inc.slice(0, 6).forEach((r,i)=>{ const f = IN[i]; text(f[0], r.n, 'Income: name'); text(f[1], r.r, 'Income: relationship'); text(f[2], r.d, 'Income: date of birth', true); text(f[3], r.p, 'Income: PPS number'); text(f[4], money(r.i), 'Income: amount', true); });
@@ -4527,7 +4528,7 @@ document.getElementById('cgfBuild').addEventListener('click', async ()=>{
     if(d.owner === 'landlord') send.push('From your landlord: proof the Local Property Tax is in order, your tenancy agreement registered with the RTB, and a letter giving permission for the work');
     if(d.owner === 'ahb') send.push('From the housing body: proof the Local Property Tax is in order and a letter giving permission for the work');
     if(d.g[0]) send.push('An occupational therapist’s report, if the work is a stair lift, through-floor lift, fixed hoist, extension or a big change to how a room is used (or the council can arrange the assessment)');
-    if(d.g[1]) send.push('An occupational therapist’s report, if the work is a stair lift or fixed hoist (or the council can arrange it)');
+    else if(d.g[1]) send.push('An occupational therapist’s report, if the work is a stair lift or fixed hoist (or the council can arrange it)');
     if(d.g[2]) send.push('For roof repairs: a letter from your insurer saying the repairs are not covered. For wiring: a Periodic Inspection Report from a Safe Electric registered electrician. For heating: a heating contractor’s report on the existing system.');
     let h = '<div class="result"><span class="tag yes">'+ntEsc(nt('Ready','Réidh'))+'</span><h3>'+ntEsc(nt('Your filled-in council grant application','D’iarratas comhairle líonta ar dheontas'))+'</h3>' +
       '<p>'+ntEsc(nt('The official 22-page form with your answers in the boxes, in block capitals as the form asks. Print it, sign it, add your documents and send it to the housing grants section of your council. Do not start any work until the council approves the grant in writing.','An fhoirm oifigiúil 22 leathanach le do fhreagraí sna boscaí, i gceannlitreacha mar a iarrann an fhoirm. Priontáil í, sínigh í, cuir do dhoiciméid léi agus seol chuig rannóg deontas tithíochta do chomhairle í. Ná tosaigh aon obair go dtí go gceadaíonn an chomhairle an deontas i scríbhinn.'))+'</p>';
