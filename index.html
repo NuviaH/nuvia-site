@@ -2234,6 +2234,8 @@ const SRC = {
   rtcChild:['Revenue: Rent Tax Credit, further conditions where a property is used by your child','https://www.revenue.ie/en/personal-tax-credits-reliefs-and-exemptions/land-and-property/rent-credit/used-by-child.aspx'],
   fourYr:['Revenue: Four year rule','https://www.revenue.ie/en/personal-tax-credits-reliefs-and-exemptions/four-year-rule/index.aspx'],
   fa22s13:['Irish Statute Book: Finance Act 2022, section 13 (Rent Tax Credit)','https://www.irishstatutebook.ie/2022/en/act/pub/0044/sec0013.html'],
+  form12s:['Revenue: Form 12S, paper Income Tax Return for people who cannot use online services','https://www.revenue.ie/en/self-assessment-and-self-employment/documents/form-12s.pdf'],
+  payeLine:['Revenue: PAYE jobs and pensions helpline','https://www.revenue.ie/en/contact-us/standard-customer-contacts/paye-jobs-and-pensions-helpline.aspx'],
   rtcRev:['Revenue: Rent Tax Credit, how much can you claim','https://www.revenue.ie/en/personal-tax-credits-reliefs-and-exemptions/land-and-property/rent-credit/how-much-claim.aspx'],
   budIT:['The Irish Times: When budget changes kick in and how to claim them (7 October 2026)','https://www.irishtimes.com/politics/2026/10/07/when-budget-changes-kick-in-and-how-to-claim-them/'],
   budIE:['Irish Examiner: Budget 2027, 5k boost to new home grant','https://www.irishexaminer.com/news/politics/arid-41920153.html'],
@@ -2324,7 +2326,7 @@ const RULES = {
     todo:[
       bi('35% of net income is a guideline for affordable rent, not a cap. That comes from one housing body’s FAQ (Cluid), not from a government page.',
          'Is treoir í 35% d’ioncam glan do chíos inacmhainne, ní uasteorainn. Is as ceisteanna coitianta comhlachta tithíochta amháin (Cluid) a thagann sé sin, ní ó leathanach rialtais.')]},
-  rtc:{t:bi('Rent Tax Credit','Creidmheas Cánach Cíosa'), st:'mix', chk:'2026-11-24', src:['rtcRev','rtcCond','rtcHow','fourYr','rtcChild','fa22s13','budIT','budIE'],
+  rtc:{t:bi('Rent Tax Credit','Creidmheas Cánach Cíosa'), st:'mix', chk:'2026-11-24', src:['rtcRev','rtcCond','rtcHow','fourYr','rtcChild','fa22s13','form12s','payeLine','budIT','budIE'],
     ok:[
       bi('Revenue’s page shows €1,000 a year for a single person and €2,000 for a jointly assessed couple for 2024 to 2028. It is worth 20% of the rent you pay, up to those amounts, and cannot be more than your income tax.',
          'Léiríonn leathanach Revenue €1,000 sa bhliain d’aon duine amháin agus €2,000 do lánúin a measúnaítear le chéile do 2024 go 2028. Is fiú 20% den chíos a íocann tú é, suas leis na méideanna sin, agus ní féidir é a bheith níos mó ná do cháin ioncaim.'),
@@ -4988,7 +4990,8 @@ const RTC_CAP = {2022:[500,1000], 2023:[500,1000], 2024:[1000,2000], 2025:[1000,
 const RTC_LINK = {
   how:'https://www.revenue.ie/en/personal-tax-credits-reliefs-and-exemptions/land-and-property/rent-credit/how-to-claim.aspx',
   cond:'https://www.revenue.ie/en/personal-tax-credits-reliefs-and-exemptions/land-and-property/rent-credit/qualifying-conditions.aspx',
-  four:'https://www.revenue.ie/en/personal-tax-credits-reliefs-and-exemptions/four-year-rule/index.aspx'
+  four:'https://www.revenue.ie/en/personal-tax-credits-reliefs-and-exemptions/four-year-rule/index.aspx',
+  f12s:'https://www.revenue.ie/en/self-assessment-and-self-employment/documents/form-12s.pdf'
 };
 function rtcNow(){ const d = new Date(); return {y:d.getFullYear(), m:d.getMonth() + 1, utc:Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())}; }
 function rtcYears(){ const n = rtcNow().y, out = []; for(let y = Math.max(2022, n - 4); y <= Math.min(n, 2028); y++) out.push(y); return out; }
@@ -5077,6 +5080,8 @@ function rtcSteps(c){
   if(cur) S.push(nt('For '+cur.y+': in myAccount, go to PAYE Services, choose ‘Manage your tax '+cur.y+'’, then ‘Add new credits’, and claim the Rent Tax Credit under ‘You and your family’. You can also claim it in your '+cur.y+' tax return next year.',
     'Do '+cur.y+': in myAccount, téigh go PAYE Services, roghnaigh ‘Manage your tax '+cur.y+'’, ansin ‘Add new credits’, agus éiligh an Creidmheas Cánach Cíosa faoi ‘You and your family’. Is féidir leat é a éileamh i do thuairisceán cánach '+cur.y+' an bhliain seo chugainn freisin.'));
   S.push(nt('If you file a Form 11 through ROS, claim in the Rent Tax Credit section of each year’s return instead.','Má chomhdaíonn tú Foirm 11 trí ROS, éiligh i gcuid an Chreidmheasa Cánach Cíosa de thuairisceán gach bliana ina ionad.'));
+  S.push(nt('Cannot use myAccount? Revenue has a paper return, Form 12S, for people who cannot use online services. It is for the '+(N.y - 1)+' tax year, and the Rent Tax Credit questions are near the end. Post it to your Revenue office: write FREEPOST above the address and no stamp is needed. For other years, ring Revenue’s PAYE line on 01 738 3636 (9.30am to 1.30pm, Monday to Friday).',
+    'Ní féidir leat myAccount a úsáid? Tá tuairisceán páipéir ag Revenue, Foirm 12S, do dhaoine nach féidir leo seirbhísí ar líne a úsáid. Is don bhliain chánach '+(N.y - 1)+' í, agus tá ceisteanna an Chreidmheasa Cánach Cíosa i dtreo an deiridh. Seol chuig d’oifig Revenue í: scríobh FREEPOST os cionn an tseolta agus ní theastaíonn stampa. Do bhlianta eile, cuir glao ar líne PAYE Revenue ar 01 738 3636 (9.30rn go 1.30in, Luan go hAoine).'));
   return S;
 }
 function rtcUpdate(){
@@ -5107,7 +5112,7 @@ function rtcUpdate(){
   if(urgent) h += '<p class="rtcwarn">'+ntEsc(nt('Claims for '+oldest.y+' must reach Revenue by '+rtcDl(oldest.y)+'. That is '+rtcDaysLeft(oldest.y)+' days from today.','Caithfidh éilimh do '+oldest.y+' Revenue a bhaint amach faoi '+rtcDl(oldest.y)+'. Sin '+rtcDaysLeft(oldest.y)+' lá ón lá inniu.'))+'</p>';
   h += '<div style="font-weight:600;color:var(--ink);margin:.8rem 0 .3rem">'+ntEsc(nt('How to claim','Conas éileamh'))+'</div><ol class="rtcsteps">'+rtcSteps(c).map(x=>'<li>'+ntEsc(x)+'</li>').join('')+'</ol>';
   h += '<details class="docs"><summary>'+ntEsc(nt('Good to know','Is fiú a fhios a bheith agat'))+'</summary><ul class="doclist">'+rtcNotes(c).map(x=>'<li>'+ntEsc(x)+'</li>').join('')+'</ul></details>';
-  h += '<p style="font-size:.9rem;margin:.6rem 0 0"><a href="'+RTC_LINK.how+'" target="_blank" rel="noopener">'+ntEsc(nt('Revenue: how to claim →','Revenue: conas éileamh →'))+'</a> &nbsp; <a href="'+RTC_LINK.four+'" target="_blank" rel="noopener">'+ntEsc(nt('Revenue: the four-year rule →','Revenue: an riail cheithre bliana →'))+'</a></p>';
+  h += '<p style="font-size:.9rem;margin:.6rem 0 0"><a href="'+RTC_LINK.how+'" target="_blank" rel="noopener">'+ntEsc(nt('Revenue: how to claim →','Revenue: conas éileamh →'))+'</a> &nbsp; <a href="'+RTC_LINK.four+'" target="_blank" rel="noopener">'+ntEsc(nt('Revenue: the four-year rule →','Revenue: an riail cheithre bliana →'))+'</a> &nbsp; <a href="'+RTC_LINK.f12s+'" target="_blank" rel="noopener">'+ntEsc(nt('Paper Form 12S (PDF) →','Foirm 12S ar pháipéar (PDF) →'))+'</a></p>';
   h += '<div class="sharebar" style="margin-top:.9rem"><button type="button" class="primary" id="rpSheet">'+ntEsc(nt('Make my claim sheet','Déan mo bhileog éilimh'))+'</button><button type="button" class="secondary" id="rpLetter">'+ntEsc(nt('Ask for the RTB number','Iarr uimhir an RTB'))+'</button>'+(urgent ? '<button type="button" class="secondary" id="rpCal">'+ntEsc(nt('Add a reminder to my calendar','Cuir meabhrúchán le m’fhéilire'))+'</button>' : '')+'</div><div id="rpDoc"></div></div>';
   const shown = !!(document.getElementById('rpDoc') && document.getElementById('rpDoc').innerHTML);
   if(out.dataset.sig === h && document.getElementById('rpSheet')){ if(shown){ if(rtcLastDoc === 'sheet') rtcShowSheet(); else if(rtcLastDoc === 'letter') rtcShowLetter(); } return; }
