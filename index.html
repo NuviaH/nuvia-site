@@ -302,6 +302,25 @@ details.why summary:hover,details.rule summary:hover{color:var(--brass-deep)}
 .grref li{margin-bottom:.35rem}
 .grpay{margin:-.5rem 0 1.1rem 1.15rem; padding:0; font-size:.95rem; color:var(--ink-soft)}
 .grpay li{margin:.12rem 0}
+.rtcfill{display:flex; gap:.4rem .7rem; align-items:flex-end; flex-wrap:wrap}
+.rtcfill button{margin-bottom:.15rem}
+.rtcy{border:1px solid var(--line); border-radius:14px; padding:.65rem .85rem .15rem; margin:.5rem 0; background:var(--card)}
+.rtcyh{display:flex; justify-content:space-between; align-items:baseline; gap:.2rem .8rem; flex-wrap:wrap}
+.rtcyh strong{color:var(--ink); font-size:1.05rem}
+.rtcdl{font-size:.82rem; color:var(--ink-soft)}
+.rtcdl.soon{color:var(--brick); font-weight:600}
+.rtcyi{display:flex; gap:.2rem .8rem; align-items:flex-end; flex-wrap:wrap; margin-top:.45rem}
+.rtcyi .field{flex:1 1 10rem; margin-bottom:.7rem}
+.rtcyi .chk{margin-bottom:1.25rem}
+.rtcwarn{background:var(--maybe-bg); background:color-mix(in srgb, var(--brick) 10%, var(--card)); border-left:4px solid var(--brick); padding:.6rem .8rem; border-radius:8px; color:var(--ink); font-weight:500; margin:.7rem 0}
+.rtcsteps{margin:.2rem 0 .6rem; padding-left:1.2rem}
+.rtcsteps li{margin:.35rem 0; color:var(--ink)}
+#solo{margin-top:.4rem}
+.solonav{margin:0 0 1rem; font-size:.95rem}
+.soloh{font-size:clamp(1.7rem,5.5vw,2.4rem); line-height:1.1; margin:.2rem 0 .6rem}
+#solo #rtcp > h2{position:absolute; width:1px; height:1px; margin:-1px; padding:0; overflow:hidden; clip:rect(0 0 0 0); clip-path:inset(50%); white-space:nowrap; border:0}
+#rtcp .cols > *{min-width:0}
+.grrtcnote{margin:.45rem 0 0; font-size:.92rem}
 .srh{position:absolute; width:1px; height:1px; margin:-1px; padding:0; overflow:hidden; clip:rect(0 0 0 0); clip-path:inset(50%); white-space:nowrap; border:0}
 .grpre{white-space:pre-wrap; font-family:inherit; font-size:.93rem; background:var(--card); border:1px solid var(--line); border-radius:14px; padding:1rem 1.1rem; margin:.8rem 0; color:var(--ink)}
 .grtbl{border-collapse:collapse; width:100%; font-size:.9rem}
@@ -352,6 +371,12 @@ details.why summary:hover,details.rule summary:hover{color:var(--brass-deep)}
   </header>
 
   <div class="progress" id="progress"></div>
+  <div id="solo" style="display:none">
+    <p class="solonav"><a href="./">← All of Nuvia’s help</a></p>
+    <h1 class="soloh noga" id="soloH"></h1>
+    <div id="soloBody"></div>
+    <p class="solonav" style="margin-top:2rem"><a href="./">See what other housing help you qualify for →</a></p>
+  </div>
 
   <form id="quiz">
     <div class="step active" data-step="0">
@@ -365,6 +390,7 @@ details.why summary:hover,details.rule summary:hover{color:var(--brass-deep)}
         <button type="button" class="opt" data-value="improve">I want grants to improve or adapt my home</button>
       </div>
       <p class="sub grstagenote">Nuvia covers every stage of a home: renting, buying, improving it, and adapting it as you get older.</p>
+      <p class="sub grrtcnote">Renting, or paying rent for a student? <a href="#rtc">Check if you can still claim the Rent Tax Credit for past years</a>.<span id="rtcNoteDl" class="noga"></span></p>
     </div>
 
     <div class="step" data-step="1">
@@ -681,6 +707,14 @@ details.why summary:hover,details.rule summary:hover{color:var(--brass-deep)}
       <div id="lletOut" style="margin-top:1rem"></div>
     </div>
 
+    <div id="rtcp" style="display:none; margin-top:2.4rem; padding-top:1.8rem; border-top:1px solid var(--line)">
+      <h2 style="font-size:1.25rem; margin:0 0 .3rem">Rent Tax Credit for past years <span class="how" style="margin:0 0 0 .3rem">Calculator</span></h2>
+      <p class="sub" style="margin-bottom:1.1rem">If you rented and did not claim, you can still claim the Rent Tax Credit from Revenue for up to four years back. Put in the rent you paid and see roughly what you could get back. Nothing leaves your device.</p>
+      <div id="rtcpFields" class="noga"></div>
+      <div id="rtcpOut" class="noga" style="margin-top:1rem"></div>
+      <p class="srh" id="rtcLive" aria-live="polite"></p>
+    </div>
+
     <button class="primary restart" id="restartBtn">Start again</button>
   </div>
 
@@ -931,6 +965,7 @@ function setupPrep(){
   setupRs(resultsData.some(r=>r.title==='Rent Supplement' && r.tag!=='no'));
   setupFhs(resultsData.some(r=>r.title==='First Home Scheme' && r.tag!=='no'));
   setupGrTools();
+  setupRtcp();
   setTimeout(()=>{ try{ profApply(); }catch(e){} }, 0);
   const panel = document.getElementById('prep');
   const keys = Object.keys(PREP).filter(k=>resultsData.some(r=>r.title===k && r.tag!=='no'));
@@ -947,6 +982,7 @@ const PANEL_DEFS = [
   ['fhs','First Home Scheme','Up to 30% of the price of a new home','Online'],
   ['lahl','Local Authority Home Loan','A State-backed mortgage when banks say no','Online or paper form'],
   ['prep','Help to Buy or Rent Tax Credit','An answer sheet with everything the application asks for','Online'],
+  ['rtcp','Rent Tax Credit for past years','Missed a year? See what you can still claim back from Revenue','Calculator'],
   ['rtb','Register your tenancy with the RTB','The form your landlord has to send in','Online or paper form'],
   ['disp','Dispute with your landlord','Deposit, notice, rent increase or repairs','Online or paper form'],
   ['cgf','Council grant application form','Adaptation, mobility aids or older people’s repair grant','Paper form'],
@@ -2181,7 +2217,7 @@ function addPlanBox(out){
 /* ---- Show your working: where each rule comes from (English and Irish, redrawn by setLang) ----
    To change a rule: edit the card, edit its entry in RULES below (confirmed / still to confirm / sources / checked date),
    add a line to RULE_LOG, then raise RULES_VER and RULES_DATE. People who kept their answers see log lines newer than their saved version. */
-const RULES_VER = '2026.11.2', RULES_DATE = '2026-11-23';
+const RULES_VER = '2026.11.3', RULES_DATE = '2026-11-24';
 function bi(en, ga){ return {en:en, ga:ga}; }
 function bt(o){ return nt(o.en, o.ga); }
 
@@ -2193,6 +2229,11 @@ const SRC = {
   crCluid:['Cluid Housing: Cost Rental FAQ','https://cluid.ie/cost-rental-faq'],
   crtis:['Housing Agency: Cost Rental Tenant in Situ','https://www.housingagency.ie/crtis/'],
   rsGov:['gov.ie: Rent Supplement (Department of Social Protection)','https://www.gov.ie/en/publication/bad761-swa-rent-supplement/'],
+  rtcCond:['Revenue: Rent Tax Credit, qualifying conditions for all claimants','https://www.revenue.ie/en/personal-tax-credits-reliefs-and-exemptions/land-and-property/rent-credit/qualifying-conditions.aspx'],
+  rtcHow:['Revenue: Rent Tax Credit, how to claim','https://www.revenue.ie/en/personal-tax-credits-reliefs-and-exemptions/land-and-property/rent-credit/how-to-claim.aspx'],
+  rtcChild:['Revenue: Rent Tax Credit, further conditions where a property is used by your child','https://www.revenue.ie/en/personal-tax-credits-reliefs-and-exemptions/land-and-property/rent-credit/used-by-child.aspx'],
+  fourYr:['Revenue: Four year rule','https://www.revenue.ie/en/personal-tax-credits-reliefs-and-exemptions/four-year-rule/index.aspx'],
+  fa22s13:['Irish Statute Book: Finance Act 2022, section 13 (Rent Tax Credit)','https://www.irishstatutebook.ie/2022/en/act/pub/0044/sec0013.html'],
   rtcRev:['Revenue: Rent Tax Credit, how much can you claim','https://www.revenue.ie/en/personal-tax-credits-reliefs-and-exemptions/land-and-property/rent-credit/how-much-claim.aspx'],
   budIT:['The Irish Times: When budget changes kick in and how to claim them (7 October 2026)','https://www.irishtimes.com/politics/2026/10/07/when-budget-changes-kick-in-and-how-to-claim-them/'],
   budIE:['Irish Examiner: Budget 2027, 5k boost to new home grant','https://www.irishexaminer.com/news/politics/arid-41920153.html'],
@@ -2283,17 +2324,21 @@ const RULES = {
     todo:[
       bi('35% of net income is a guideline for affordable rent, not a cap. That comes from one housing body’s FAQ (Cluid), not from a government page.',
          'Is treoir í 35% d’ioncam glan do chíos inacmhainne, ní uasteorainn. Is as ceisteanna coitianta comhlachta tithíochta amháin (Cluid) a thagann sé sin, ní ó leathanach rialtais.')]},
-  rtc:{t:bi('Rent Tax Credit','Creidmheas Cánach Cíosa'), st:'mix', chk:'2026-11-18', src:['rtcRev','budIT','budIE'],
+  rtc:{t:bi('Rent Tax Credit','Creidmheas Cánach Cíosa'), st:'mix', chk:'2026-11-24', src:['rtcRev','rtcCond','rtcHow','fourYr','rtcChild','fa22s13','budIT','budIE'],
     ok:[
       bi('Revenue’s page shows €1,000 a year for a single person and €2,000 for a jointly assessed couple for 2024 to 2028. It is worth 20% of the rent you pay, up to those amounts, and cannot be more than your income tax.',
          'Léiríonn leathanach Revenue €1,000 sa bhliain d’aon duine amháin agus €2,000 do lánúin a measúnaítear le chéile do 2024 go 2028. Is fiú 20% den chíos a íocann tú é, suas leis na méideanna sin, agus ní féidir é a bheith níos mó ná do cháin ioncaim.'),
       bi('The rise to €1,150 (single) and €2,300 (couple) was announced in Budget 2027 and starts in January, for the 2027 and 2028 tax years (The Irish Times, 7 October 2026).',
-         'Fógraíodh an t-ardú go €1,150 (duine amháin) agus €2,300 (lánúin) i mBuiséad 2027 agus tosóidh sé i mí Eanáir, do bhlianta cánach 2027 agus 2028 (The Irish Times, 7 Deireadh Fómhair 2026).')],
+         'Fógraíodh an t-ardú go €1,150 (duine amháin) agus €2,300 (lánúin) i mBuiséad 2027 agus tosóidh sé i mí Eanáir, do bhlianta cánach 2027 agus 2028 (The Irish Times, 7 Deireadh Fómhair 2026).'),
+      bi('For 2022 and 2023 the limits were €500 for a single person and €1,000 for a jointly assessed couple. Claims can go back four years, so claims for 2022 must be made by 31 December 2026 (Revenue’s four-year rule).',
+         'Do 2022 agus 2023 ba iad na teorainneacha ná €500 d’aon duine amháin agus €1,000 do lánúin a measúnaítear le chéile. Is féidir éilimh a dhéanamh suas le ceithre bliana siar, mar sin caithfear éilimh do 2022 a dhéanamh faoin 31 Nollaig 2026 (riail cheithre bliana Revenue).'),
+      bi('Rent paid with HAP, Rent Supplement or RAS does not qualify, even with a top-up, and neither does rent paid to an Approved Housing Body or to your parent or child. We re-read Revenue’s conditions on 24 November 2026.',
+         'Ní cháilíonn cíos a íocadh le HAP, Forlíonadh Cíosa nó RAS, fiú le híocaíocht bhreise, ná cíos a íoctar le Comhlacht Tithíochta Formheasta nó le do thuismitheoir nó do leanbh. D’athléigh muid coinníollacha Revenue an 24 Samhain 2026.')],
     todo:[
       bi('The rise is not on Revenue’s own page yet. We have it from news reports, and we have not seen the Finance Bill.',
          'Níl an t-ardú ar leathanach Revenue féin fós. Is ó thuairiscí nuachta a fuaireamar é, agus níor chonaic muid an Bille Airgeadais.'),
-      bi('Rent covered by HAP, Rent Supplement, RAS or other State housing support does not qualify. We have not re-read Revenue’s conditions page on this.',
-         'Ní cháilíonn cíos a chlúdaítear le HAP, Forlíonadh Cíosa, RAS nó tacaíocht tithíochta eile ón Stát. Níor athléigh muid leathanach choinníollacha Revenue air seo.')]},
+      bi('Rent paid to a council, and rent for a Cost Rental home, are left out by the Finance Act 2022 (section 13). Revenue’s own pages do not list them, and we have not found a later change to the Act.',
+         'Fágann an tAcht Airgeadais 2022 (alt 13) cíos a íoctar le comhairle, agus cíos do theach Cíos Costais, as an áireamh. Ní liostaíonn leathanaigh Revenue féin iad, agus níor aimsigh muid athrú níos déanaí ar an Acht.')]},
   rights:{t:bi('Your rights as a private tenant','Do chearta mar thionónta príobháideach'), st:'law', chk:'2026-11-18', src:['rtbLaw','thr'],
     ok:[
       bi('One national rent control since 1 March 2026: rent can go up once a year, by 2% or inflation, whichever is lower.',
@@ -2476,6 +2521,8 @@ function whyKey(title){ const m = WHY_MAP.find(x=>String(title).indexOf(x[0])===
 
 /* One line per change. ver is the Nuvia rules version it shipped in; affects lists rule keys, or '*' for all. */
 const RULE_LOG = [
+  {ver:'2026.11.3', date:'2026-11-24', affects:['rtc'], t:bi('New: Rent Tax Credit for past years. A calculator for the years people did not claim, with the four-year time limit, the limits for each year from 2022, and the steps to claim in myAccount, checked against Revenue on 24 November 2026.',
+    'Nua: an Creidmheas Cánach Cíosa do bhlianta roimhe seo. Áireamhán do na blianta nár éiligh daoine, leis an teorainn ama cheithre bliana, na teorainneacha do gach bliain ó 2022, agus na céimeanna chun éileamh in myAccount, seiceáilte i gcoinne Revenue an 24 Samhain 2026.')},
   {ver:'2026.11.2', date:'2026-11-23', affects:['seai','warmer','hag','water'], t:bi('New: home improvement grants. SEAI energy grants (insulation, windows and doors, heat pumps, solar panels, batteries, One Stop Shops and the Warmer Homes Scheme) and council grants (adaptation, older people’s repairs, mobility aids, septic tanks and wells), checked against SEAI, gov.ie and localgov.ie on 23 November 2026.',
     'Nua: deontais feabhsúcháin tí. Deontais fuinnimh SEAI (insliú, fuinneoga agus doirse, teaschaidéil, painéil ghréine, ceallraí, Ionaid Ilfhreastail agus Scéim na dTithe Níos Teo) agus deontais chomhairle (oiriúnú, deisiúcháin do dhaoine scothaosta, áiseanna soghluaisteachta, umair shéarachais agus toibreacha), seiceáilte i gcoinne SEAI, gov.ie agus localgov.ie an 23 Samhain 2026.')},
   {ver:'2026.11.1', date:'2026-11-18', affects:['rentsupp'], t:bi('Rent Supplement: the postal address now matches the official RS1 form (National Rent Supplement Section, Freepost, PO Box 12188, Dublin 2). Every other figure was rechecked against official sources on 18 November 2026 and is unchanged.',
@@ -4255,6 +4302,7 @@ function gaTemplate(key){
 Object.assign(GA, {"I want grants to improve or adapt my home": "Ba mhaith liom deontais chun mo theach a fheabhsú nó a oiriúnú", "Which describes you?": "Cé acu seo a bhaineann leat?", "I own the home and live in it": "Is liom an teach agus cónaím ann", "I own it and rent it out": "Is liom é agus ligim ar cíos é", "I rent the home": "Tá an teach ar cíos agam", "What would you like to do? Pick all that apply.": "Cad ba mhaith leat a dhéanamh? Roghnaigh gach ceann a bhaineann leat.", "Insulate the attic or walls": "An t-áiléar nó na ballaí a insliú", "Replace or upgrade the heating (a heat pump, for example)": "An téamh a athsholáthar nó a uasghrádú (teaschaidéal, mar shampla)", "Solar panels or a home battery": "Painéil ghréine nó ceallra baile", "New windows or doors": "Fuinneoga nó doirse nua", "A whole-home energy upgrade": "Uasghrádú fuinnimh ar an teach ar fad", "Adapt the home for a disability or mobility need": "An teach a oiriúnú do mhíchumas nó do riachtanas soghluaisteachta", "Essential repairs for someone aged 66 or over": "Deisiúcháin riachtanacha do dhuine atá 66 bliana d’aois nó níos sine", "Fix a septic tank or private well": "Umar séarachais nó tobar príobháideach a dheisiú", "What type of home is it?": "Cén cineál tí atá ann?", "Mid-terrace house": "Teach lár-sraithe", "Semi-detached or end-of-terrace house": "Teach leathscoite nó teach ag deireadh sraithe", "Detached house": "Teach scoite", "When was the home built and first lived in?": "Cathain a tógadh an teach agus a cónaíodh ann den chéad uair?", "Each grant has a cut-off year. If you are not sure, pick the nearest and check before you apply.": "Tá bliain scoir ag gach deontas. Mura bhfuil tú cinnte, roghnaigh an ceann is gaire agus seiceáil sula ndéanann tú iarratas.", "Before 2006": "Roimh 2006", "2006 to 2010": "2006 go 2010", "2011 to 2020": "2011 go 2020", "2021 to 2024": "2021 go 2024", "2025 or later": "2025 nó ina dhiaidh", "How is the home heated now?": "Conas a théitear an teach anois?", "Oil boiler": "Coire ola", "Gas boiler": "Coire gáis", "Solid fuel (coal, turf or wood)": "Breosla soladach (gual, móin nó adhmad)", "No central heating": "Gan téamh lárnach", "A heat pump already": "Teaschaidéal cheana féin", "Something else, or not sure": "Rud éigin eile, nó níl mé cinnte", "Do you, the homeowner, get any of these payments?": "An bhfaigheann tusa, úinéir an tí, aon cheann de na híocaíochtaí seo?", "Fuel Allowance": "Liúntas Breosla", "Working Family Payment": "Íocaíocht Teaghlaigh Oibre", "Domiciliary Care Allowance": "Liúntas Cúraim Baile", "Carer's Allowance, living with the person you care for": "Liúntas Cúramóra, agus tú i do chónaí leis an duine a bhfuil tú ag tabhairt aire dó", "Jobseeker's Allowance for over 6 months, with a child under 7": "Liúntas Cuardaitheora Poist le breis agus 6 mhí, le leanbh faoi 7", "Disability Allowance for over 6 months, with a child under 7": "Liúntas Míchumais le breis agus 6 mhí, le leanbh faoi 7", "Yes, I get one of these": "Faighim, ceann acu seo", "No, none of these": "Ní fhaighim, ceann ar bith acu", "Not sure": "Níl mé cinnte", "Is the home let to a tenant who gets HAP or RAS?": "An bhfuil an teach ligthe le tionónta a fhaigheann HAP nó RAS?", "Yes, HAP or RAS": "Tá, HAP nó RAS", "Did you buy this home as a first-time buyer on or after 1 January 2025?": "Ar cheannaigh tú an teach seo mar cheannaitheoir céaduaire an 1 Eanáir 2025 nó ina dhiaidh?", "Yes, I did": "Cheannaigh", "No, I didn't": "Níor cheannaigh", "Is the person applying aged 66 or over?": "An bhfuil an t-iarratasóir 66 bliana d’aois nó níos sine?", "Yes, 66 or over": "Tá, 66 nó níos sine", "No, under 66": "Níl, faoi 66", "Roughly, what was your household's gross income (before tax) last year?": "Go garbh, cén t-ioncam comhlán (roimh cháin) a bhí ag do theaghlach anuraidh?", "Councils count the income of the owner and their spouse or partner, or of the tenant and their partner if you rent. Some deductions, for example for children, can bring it down.": "Áiríonn comhairlí ioncam an úinéara agus a chéile nó a pháirtí, nó ioncam an tionónta agus a pháirtí má tá tú ar cíos. Is féidir le roinnt asbhaintí, do leanaí mar shampla, é a laghdú.", "Up to €37,500": "Suas le €37,500", "€37,501 to €43,750": "€37,501 go €43,750", "€43,751 to €50,000": "€43,751 go €50,000", "€50,001 to €62,500": "€50,001 go €62,500", "€62,501 to €75,000": "€62,501 go €75,000", "Over €75,000": "Os cionn €75,000", "Which of these applies? Pick all that do.": "Cé acu seo a bhaineann leat? Roghnaigh gach ceann a bhaineann.", "My council inspected my septic tank and wrote to say it has a fault": "Rinne mo chomhairle iniúchadh ar m’umar séarachais agus scríobh siad chugam ag rá go bhfuil locht air", "I rely on a private well and can't connect to Uisce Éireann or a group water scheme": "Táim ag brath ar thobar príobháideach agus ní féidir liom ceangal le hUisce Éireann ná le scéim uisce grúpa", "Neither, or not sure": "Ceachtar acu níl, nó níl mé cinnte", "Your council runs the adaptation, mobility, older people's repair, septic tank and well grants. Check its own page for current forms and contacts.": "Riarann do chomhairle na deontais oiriúnaithe, soghluaisteachta, deisiúcháin do dhaoine scothaosta, umar séarachais agus tobair. Seiceáil a leathanach féin le haghaidh foirmeacha agus sonraí teagmhála reatha.", "Home improvement grant amounts were checked against SEAI, gov.ie and localgov.ie on 23 November 2026.": "Seiceáladh méideanna na ndeontas feabhsúcháin tí i gcoinne SEAI, gov.ie agus localgov.ie an 23 Samhain 2026.", "No, it isn't": "Níl", "Electric heaters (storage or panel)": "Téitheoirí leictreacha (stórála nó painéil)"});
 Object.assign(GA, {"Fill in the council grant form": "Líon isteach foirm deontais na comhairle", "The official application form for the Housing Adaptation, Mobility Aids and Housing Aid for Older People grants. Answer what you can and get the 22-page form back with your answers in the boxes, plus an estimate of your grant. Everything stays on your device. Skip anything that does not apply.": "An fhoirm iarratais oifigiúil do dheontais Oiriúnaithe Tithíochta, Áiseanna Soghluaisteachta agus Cúnaimh Tithíochta do Dhaoine Scothaosta. Freagair a bhfuil ar do chumas agus faigh an fhoirm 22 leathanach ar ais le do fhreagraí sna boscaí, chomh maith le meastachán ar do dheontas. Fanann gach rud ar do ghléas. Fág amach aon rud nach mbaineann leat.", "Plan your upgrade": "Pleanáil d’uasghrádú", "Planner": "Pleanálaí", "Put in the prices from your quotes. See what you pay after grants, the order to do the work in and your deadlines, with reminders you can add to your calendar. Everything stays on your device.": "Cuir isteach na praghsanna ó do luachana. Féach cad a íocann tú tar éis deontas, an t-ord ina ndéanfar an obair agus do spriocdhátaí, le meabhrúcháin is féidir leat a chur le d’fhéilire. Fanann gach rud ar do ghléas.", "Check a contractor’s quote": "Seiceáil luachan conraitheora", "Checker": "Seiceálaí", "Before you sign, check the quote against the grant rules so nothing in it gets your grant refused.": "Sula síníonn tú, seiceáil an luachan i gcoinne rialacha an deontais ionas nach gcuirfidh aon rud ann faoi deara go ndiúltófar do do dheontas.", "Check this quote": "Seiceáil an luachan seo", "Get ready for your SEAI application": "Ullmhaigh d’iarratas chuig SEAI", "Have everything SEAI’s application asks for in one place, with the steps and the forms for after the work, in order.": "Bíodh gach rud a iarrann iarratas SEAI in aon áit amháin agat, leis na céimeanna agus na foirmeacha don tréimhse tar éis na hoibre, in ord.", "Write to your landlord": "Scríobh chuig do thiarna talún", "Letter": "Litir", "Ask your landlord to apply for energy grants, to do repairs, or for permission to adapt the home. Fill in the details and get a letter to print or email.": "Iarr ar do thiarna talún iarratas a dhéanamh ar dheontais fuinnimh, deisiúcháin a dhéanamh, nó cead a thabhairt an teach a oiriúnú. Líon isteach na sonraí agus faigh litir le priontáil nó le seoladh ar ríomhphost.", "Write my letter": "Scríobh mo litir", "Council grant application form": "Foirm iarratais ar dheontas comhairle", "Adaptation, mobility aids or older people’s repair grant": "Deontas oiriúnaithe, áiseanna soghluaisteachta nó deisiúcháin do dhaoine scothaosta", "What you pay after grants, the order of work and your deadlines": "Cad a íocann tú tar éis deontas, ord na hoibre agus do spriocdhátaí", "Before you sign: will it meet the grant rules?": "Sula síníonn tú: an gcomhlíonfaidh sé rialacha an deontais?", "What SEAI asks for, and the forms for after the work": "Cad a iarrann SEAI, agus na foirmeacha don tréimhse tar éis na hoibre", "Letter to your landlord": "Litir chuig do thiarna talún", "Ask for energy grants, repairs or permission to adapt the home": "Iarr deontais fuinnimh, deisiúcháin nó cead an teach a oiriúnú", "Nuvia covers every stage of a home: renting, buying, improving it, and adapting it as you get older.": "Clúdaíonn Nuvia gach céim de theach: ar cíos, ag ceannach, á fheabhsú, agus á oiriúnú de réir mar a théann tú in aois.", "Which grants?": "Cé na deontais?", "Housing Adaptation Grant for Disabled People": "Deontas Oiriúnaithe Tithíochta do Dhaoine faoi Mhíchumas", "Mobility Aids Grant": "Deontas Áiseanna Soghluaisteachta", "Housing Aid for Older People Grant": "Deontas Cúnaimh Tithíochta do Dhaoine Scothaosta", "One form covers all three, so you can apply for more than one at once.": "Clúdaíonn foirm amháin an trí cinn, mar sin is féidir leat iarratas a dhéanamh ar níos mó ná ceann amháin ag an am céanna.", "The person the grant is for": "An duine a bhfuil an deontas dó", "Full name": "Ainm iomlán", "Someone filling this in for them (if it applies)": "Duine atá á líonadh seo ar a son (más ábhartha)", "Their name": "A ainm", "Their address": "A sheoladh", "Their Eircode": "A Éirchód", "Their email": "A ríomhphost", "Their phone": "A fhón", "Their relationship to the person the grant is for": "A ghaol leis an duine a bhfuil an deontas dó", "Can the council discuss the application with this person?": "An féidir leis an gcomhairle an t-iarratas a phlé leis an duine seo?", "Grants paid before": "Deontais a íocadh cheana", "A Housing Adaptation Grant has been paid before for this home or person": "Íocadh Deontas Oiriúnaithe Tithíochta cheana don teach nó don duine seo", "A Mobility Aids Grant has been paid before for this home or person": "Íocadh Deontas Áiseanna Soghluaisteachta cheana don teach nó don duine seo", "A Housing Aid for Older People Grant has been paid before for this home or person": "Íocadh Deontas Cúnaimh Tithíochta do Dhaoine Scothaosta cheana don teach nó don duine seo", "Care and housing costs": "Costais chúraim agus tithíochta", "Is a relative caring full-time for the person the grant is for?": "An bhfuil gaol ag tabhairt aire go lánaimseartha don duine a bhfuil an deontas dó?", "The carer’s name": "Ainm an chúramóra", "Their relationship to the person": "A ghaol leis an duine", "Monthly rent or mortgage repayment for the home (€)": "Cíos nó aisíocaíocht mhorgáiste mhíosúil don teach (€)", "Part of that paid by the Government each month (€), if any": "An chuid de sin a íocann an Rialtas gach mí (€), más ann", "Is a member of the household living in residential care?": "An bhfuil ball den teaghlach ina chónaí i gcúram cónaithe?", "How long have they been in residential care?": "Cá fhad atá siad i gcúram cónaithe?", "Monthly cost of the care (€)": "Costas míosúil an chúraim (€)", "Is a member of the household paying for homecare?": "An bhfuil ball den teaghlach ag íoc as cúram baile?", "Name of the person getting homecare": "Ainm an duine atá ag fáil cúraim bhaile", "How long have they been getting it?": "Cá fhad atá siad á fháil?", "Monthly cost of the homecare (€)": "Costas míosúil an chúraim bhaile (€)", "The home and the work": "An teach agus an obair", "Is the work at a different address from the one above?": "An bhfuil an obair ag seoladh difriúil ón gceann thuas?", "Name of the owner of that home": "Ainm úinéir an tí sin", "Address of the home where the work will be done": "Seoladh an tí ina ndéanfar an obair", "How long has the person the grant is for lived there?": "Cá fhad atá an duine a bhfuil an deontas dó ina chónaí ann?", "Will they be living there when the work is done?": "An mbeidh siad ina gcónaí ann nuair a bheidh an obair déanta?", "This is a condition of the grant.": "Is coinníoll den deontas é seo.", "Who owns the home?": "Cé leis an teach?", "You own it": "Is leatsa é", "Your family own it": "Is le do theaghlach é", "A landlord": "Tiarna talún", "An approved housing body": "Comhlacht tithíochta ceadaithe", "Is this for a home you plan to build?": "An le haghaidh tí atá beartaithe agat a thógáil é seo?", "Type of home": "Cineál tí", "An apartment": "Árasán", "Was the home built in the last 12 months?": "Ar tógadh an teach le 12 mhí anuas?", "Is the Local Property Tax for the home up to date?": "An bhfuil an Cháin Mhaoine Áitiúil don teach íoctha go dáta?", "You send proof: a letter from Revenue, or a printout of the LPT profile and the full online payment record.": "Seolann tú cruthúnas: litir ó Revenue, nó cóip phriontáilte de phróifíl CMÁ agus an taifead iomlán íocaíochta ar líne.", "The work you want done": "An obair atá uait", "Get professional advice first. Be specific, for example: stair lift to the first floor and a level-access shower in the downstairs bathroom.": "Faigh comhairle ghairmiúil ar dtús. Bí sonrach, mar shampla: ardaitheoir staighre go dtí an chéad urlár agus cithfholcadán rochtana cothrom sa seomra folctha thíos staighre.", "Estimated cost of the work, including VAT (€)": "Costas measta na hoibre, CBL san áireamh (€)", "Can you pay any part of the cost the grant does not cover?": "An féidir leat aon chuid den chostas nach gclúdaíonn an deontas a íoc?", "Smoke or heat alarms already in the home (number)": "Aláraim deataigh nó teasa sa teach cheana (líon)", "An approved home needs at least two, with 10-year batteries.": "Teastaíonn dhá cheann ar a laghad ó theach ceadaithe, le ceallraí 10 mbliana.", "Carbon monoxide alarms already in the home (number)": "Aláraim aonocsaíd charbóin sa teach cheana (líon)", "Needed if you heat with gas, oil, coal or another fossil fuel.": "Ag teastáil má théann tú le gás, ola, gual nó breosla iontaise eile.", "Number of rooms in the home": "Líon na seomraí sa teach", "Bedrooms": "Seomraí codlata", "Bathrooms": "Seomraí folctha", "Living": "Suí", "Dining": "Bia", "Upstairs": "Thuas staighre", "Downstairs": "Thíos staighre", "Person 1 (usually the owner, or the tenant if you rent)": "Duine 1 (an t-úinéir de ghnáth, nó an tionónta má tá tú ar cíos)", "Person 2 (their spouse, if any)": "Duine 2 (a chéile, más ann)", "Person 3": "Duine 3", "Person 4": "Duine 4", "Person 5": "Duine 5", "Person 6": "Duine 6", "Relationship to the person the grant is for": "Gaol leis an duine a bhfuil an deontas dó", "Income last tax year, including pension (€)": "Ioncam an bhliain cánach seo caite, pinsean san áireamh (€)", "Add another person": "Cuir duine eile leis", "Of the income above, how much was payments that are not counted (€)?": "Den ioncam thuas, cé mhéad a bhí ina íocaíochtaí nach n-áirítear (€)?", "Carer’s Allowance or Benefit, Fuel Allowance, Child Benefit, Domiciliary Care Allowance, Working Family Payment, Household Benefits, Living Alone Increase, Foster Care Allowance, Carer’s Support Grant. Not written on the form; it only makes your estimate more accurate.": "Liúntas nó Sochar Cúramóra, Liúntas Breosla, Sochar Linbh, Liúntas Cúraim Baile, Íocaíocht Teaghlaigh Oibre, Sochair Teaghlaigh, Méadú Maireachtála Aonair, Liúntas Cúraim Altrama, Deontas Tacaíochta Cúramóra. Ní scríobhtar ar an bhfoirm é; ní dhéanann sé ach do mheastachán níos cruinne.", "Household income (last tax year)": "Ioncam an teaghlaigh (an bhliain cánach seo caite)", "Dependant 1": "Cleithiúnaí 1", "Dependant 2": "Cleithiúnaí 2", "Dependant 3": "Cleithiúnaí 3", "Dependant 4": "Cleithiúnaí 4", "Dependant 5": "Cleithiúnaí 5", "School or college, if any": "Scoil nó coláiste, más ann", "Add another dependant": "Cuir cleithiúnaí eile leis", "Dependants: under 18, or under 23 in full-time education": "Cleithiúnaithe: faoi 18, nó faoi 23 in oideachas lánaimseartha", "Price on your quote (€)": "Praghas ar do luachan (€)", "Type of wall insulation": "Cineál insliú balla", "Cavity": "Cuasach", "Internal (dry-lining)": "Inmheánach (tirimlíneáil)", "External (the wrap)": "Seachtrach (an fillteán)", "Outside doors being replaced": "Doirse seachtracha á n-athsholáthar", "One": "Ceann amháin", "Two": "Dhá cheann", "Windows are included": "Tá fuinneoga san áireamh", "Size of the panels (kWp)": "Méid na bpainéal (kWp)", "Battery size (kWh)": "Méid an cheallra (kWh)", "Your dates": "Do dhátaí", "The date you plan to apply": "An dáta a bhfuil sé beartaithe agat iarratas a dhéanamh", "How will you apply?": "Conas a dhéanfaidh tú iarratas?", "By post": "Tríd an bpost", "The date on your grant offer, if you already have it": "An dáta ar do thairiscint deontais, má tá sí agat cheana", "Use this if you have the offer. It gives the exact expiry date.": "Úsáid é seo má tá an tairiscint agat. Tugann sé an dáta éaga cruinn.", "Which upgrade is the quote for?": "Cén t-uasghrádú dá bhfuil an luachan?", "Is the contractor on SEAI’s register for this type of work?": "An bhfuil an conraitheoir ar chlár SEAI don chineál seo oibre?", "Check on SEAI’s register before you sign. For solar panels and batteries, use SEAI’s list of registered solar PV companies.": "Seiceáil ar chlár SEAI sula síníonn tú. Le haghaidh painéal gréine agus ceallraí, úsáid liosta SEAI de chomhlachtaí gréine PV cláraithe.", "Has any of this work started, or have materials been bought?": "Ar thosaigh aon chuid den obair seo, nó ar ceannaíodh ábhair?", "Will you get a written contract with the works, price, timing, payment terms and warranties?": "An bhfaighidh tú conradh i scríbhinn leis na hoibreacha, an praghas, an t-am, na téarmaí íocaíochta agus na barántais?", "Total price on the quote (€)": "Praghas iomlán ar an luachan (€)", "Does the price include VAT?": "An gcuimsíonn an praghas CBL?", "Is there another apartment directly above?": "An bhfuil árasán eile díreach os a chionn?", "Does the quote cover every outside wall of the home?": "An gclúdaíonn an luachan gach balla seachtrach den teach?", "Are the walls traditional solid stone or brick with no cavity (most homes built before 1940)?": "An ballaí traidisiúnta soladacha cloiche nó brící gan chuasán iad (an chuid is mó de thithe a tógadh roimh 1940)?", "Has the contractor said whether ESB Networks needs to move the electricity cables?": "Ar dhúirt an conraitheoir an gcaithfidh ESB Networks na cáblaí leictreachais a bhogadh?", "For external insulation.": "D’insliú seachtrach.", "U-value of the new windows, from the quote": "Luach U na bhfuinneog nua, ón luachan", "The grant needs 1.4 or lower.": "Teastaíonn 1.4 nó níos ísle ón deontas.", "Are the attic and walls rated Good or Very Good on your BER advisory report, or did they get SEAI grants?": "An bhfuil an t-áiléar agus na ballaí rátáilte Maith nó An-mhaith ar do thuarascáil chomhairleach BER, nó an bhfuair siad deontais SEAI?", "How many outside doors are on the quote?": "Cé mhéad doras seachtrach atá ar an luachan?", "Is one contractor fitting all the doors?": "An bhfuil conraitheoir amháin ag feistiú na ndoirse ar fad?", "Has a heat loss assessment been done, or does your BER show a Heat Loss Indicator of 2.3 or lower?": "An ndearnadh measúnú caillteanais teasa, nó an dtaispeánann do BER Táscaire Caillteanais Teasa de 2.3 nó níos ísle?", "Needed for homes built before 2007.": "Ag teastáil do thithe a tógadh roimh 2007.", "Is the heat pump on one contract and one invoice?": "An bhfuil an teaschaidéal ar chonradh amháin agus ar shonrasc amháin?", "0% VAT applies when it is.": "Baineann CBL 0% leis nuair atá.", "Is VAT charged on the heat pump?": "An ngearrtar CBL ar an teaschaidéal?", "Are you also claiming the heating controls grant for this home?": "An bhfuil tú ag éileamh deontas na rialuithe téimh don teach seo freisin?", "Size of the panels on the quote (kWp)": "Méid na bpainéal ar an luachan (kWp)", "Battery size on the quote (kWh)": "Méid an cheallra ar an luachan (kWh)", "Has this home had this grant before, even under a previous owner?": "An bhfuair an teach seo an deontas seo cheana, fiú faoi úinéir roimhe seo?", "SEAI register of contractors →": "Clár conraitheoirí SEAI →", "SEAI solar PV companies →": "Comhlachtaí gréine PV SEAI →", "Owner’s name (or names)": "Ainm an úinéara (nó ainmneacha)", "Address of the home": "Seoladh an tí", "MPRN (11 digits, on your electricity bill)": "MPRN (11 dhigit, ar do bhille leictreachais)", "Year the home was built": "An bhliain a tógadh an teach", "Not sure? ESB Networks can tell you the year the home was connected to the electricity network.": "Níl tú cinnte? Is féidir le ESB Networks an bhliain a ceanglaíodh an teach leis an ngréasán leictreachais a insint duit.", "Your registered contractor for each upgrade": "Do chonraitheoir cláraithe do gach uasghrádú", "Your address (the rented home)": "Do sheoladh (an teach ar cíos)", "Landlord or agent’s name": "Ainm an tiarna talún nó an ghníomhaire", "Is your tenancy supported by HAP or RAS?": "An bhfuil tacaíocht HAP nó RAS ag do thionóntacht?", "Your council": "Do chomhairle", "Repairs needed (if any)": "Deisiúcháin atá ag teastáil (más ann)", "For example: the heating does not work in two bedrooms, and there is damp in the back bedroom.": "Mar shampla: ní oibríonn an téamh i dhá sheomra codlata, agus tá taise sa seomra codlata cúil.", "Adaptations you would like (if any)": "Oiriúnuithe ba mhaith leat (más ann)", "For example: grab rails and a level-access shower.": "Mar shampla: ráillí greama agus cithfholcadán rochtana cothrom.", "What the letter asks for": "Cad a iarrann an litir", "Apply for SEAI energy grants for the home": "Iarratas a dhéanamh ar dheontais fuinnimh SEAI don teach", "Permission to adapt the home for a disability or mobility need": "Cead an teach a oiriúnú do mhíchumas nó do riachtanas soghluaisteachta", "Repairs": "Deisiúcháin", "Attic insulation": "Insliú áiléir", "Attic insulation: contractor name": "Insliú áiléir: ainm an chonraitheora", "Attic insulation: SEAI contractor ID": "Insliú áiléir: aitheantas conraitheora SEAI", "Wall insulation": "Insliú balla", "Wall insulation: contractor name": "Insliú balla: ainm an chonraitheora", "Wall insulation: SEAI contractor ID": "Insliú balla: aitheantas conraitheora SEAI", "Windows and doors": "Fuinneoga agus doirse", "Windows and doors: contractor name": "Fuinneoga agus doirse: ainm an chonraitheora", "Windows and doors: SEAI contractor ID": "Fuinneoga agus doirse: aitheantas conraitheora SEAI", "Heat pump": "Teaschaidéal", "Heat pump: contractor name": "Teaschaidéal: ainm an chonraitheora", "Heat pump: SEAI contractor ID": "Teaschaidéal: aitheantas conraitheora SEAI", "Heating controls": "Rialuithe téimh", "Heating controls: contractor name": "Rialuithe téimh: ainm an chonraitheora", "Heating controls: SEAI contractor ID": "Rialuithe téimh: aitheantas conraitheora SEAI", "Solar panels": "Painéil ghréine", "Solar panels: contractor name": "Painéil ghréine: ainm an chonraitheora", "Solar panels: SEAI contractor ID": "Painéil ghréine: aitheantas conraitheora SEAI", "Battery": "Ceallra", "Battery: contractor name": "Ceallra: ainm an chonraitheora", "Battery: SEAI contractor ID": "Ceallra: aitheantas conraitheora SEAI", "Solar water heating": "Téamh uisce gréine", "Solar water heating: contractor name": "Téamh uisce gréine: ainm an chonraitheora", "Solar water heating: SEAI contractor ID": "Téamh uisce gréine: aitheantas conraitheora SEAI", "BER after the works": "BER tar éis na n-oibreacha", "BER after the works: contractor name": "BER tar éis na n-oibreacha: ainm an chonraitheora", "BER after the works: SEAI contractor ID": "BER tar éis na n-oibreacha: aitheantas conraitheora SEAI", "Name": "Ainm", "Your name": "Do ainm", "Add these dates to my calendar": "Cuir na dátaí seo le m’fhéilire", "Download my plan": "Íoslódáil mo phlean", "Next part →": "An chéad chuid eile →", "Finish: fill in the form ↓": "Críochnaigh: líon isteach an fhoirm ↓", "Who is the carer?": "Cé hé an cúramóir?", "Someone else": "Duine eile", "The person filling in this form": "An duine atá ag líonadh na foirme seo", "Person 1 is the person the grant is for (their name, date of birth and PPS number are taken from above)": "Is é Duine 1 an duine a bhfuil an deontas dó (tógtar a ainm, a dháta breithe agus a uimhir PPS ón méid thuas)", "The person the grant is for is under 18, or under 23 in full-time education": "Tá an duine a bhfuil an deontas dó faoi 18, nó faoi 23 in oideachas lánaimseartha", "Their school or college, if any": "A scoil nó a choláiste, más ann"});
 Object.assign(GA, {"Your results": "Do thorthaí"});
+Object.assign(GA, {"Rent Tax Credit for past years": "An Creidmheas Cánach Cíosa do bhlianta roimhe seo", "Calculator": "Áireamhán", "If you rented and did not claim, you can still claim the Rent Tax Credit from Revenue for up to four years back. Put in the rent you paid and see roughly what you could get back. Nothing leaves your device.": "Má bhí tú ar cíos agus nár éiligh tú, is féidir leat an Creidmheas Cánach Cíosa a éileamh ó Revenue fós suas le ceithre bliana siar. Cuir isteach an cíos a d’íoc tú agus feic cé mhéad, go garbh, a d’fhéadfá a fháil ar ais. Ní fhágann aon rud do ghléas.", "Missed a year? See what you can still claim back from Revenue": "Ar chaill tú bliain? Féach cad is féidir leat a éileamh ar ais ó Revenue fós", "← All of Nuvia’s help": "← Cabhair uile Nuvia", "See what other housing help you qualify for →": "Féach cén chabhair tithíochta eile a bhfuil tú i dteideal di →", "Renting, or paying rent for a student?": "Ar cíos, nó ag íoc cíosa do mhac léinn?", "Check if you can still claim the Rent Tax Credit for past years": "Seiceáil an féidir leat an Creidmheas Cánach Cíosa a éileamh fós do bhlianta roimhe seo"});
 let gaBusy = false;
 function gaNode(n){
   if(gaDone.has(n)){ return; }
@@ -4301,7 +4349,7 @@ function gaApply(root){
 }
 const gaObs = new MutationObserver(ms=>{ if(gaBusy || lang !== 'ga') return; gaApply(document.body); });
 function setLang(l){
-  lang = l; try{ if(state.situation === 'improve' && document.getElementById('resultsWrap').style.display === 'block') renderResults(); }catch(e){}
+  lang = l; try{ rtcLang(); }catch(e){} try{ if(state.situation === 'improve' && document.getElementById('resultsWrap').style.display === 'block') renderResults(); }catch(e){}
   try{ document.querySelectorAll('.grstages').forEach(el=>{ const t = document.createElement('div'); addStageBox(t); if(t.firstChild) el.replaceWith(t.firstChild); }); }catch(e){} try{ if(document.getElementById('noticePanel')) ntRender(); }catch(e){} try{ whyRefreshAll(); }catch(e){} document.documentElement.lang = l === 'ga' ? 'ga' : 'en';
   const btn = document.getElementById('langBtn'); if(btn) btn.textContent = l === 'ga' ? 'English' : 'Gaeilge';
   try{ localStorage.setItem('hn-lang', l); }catch(e){}
@@ -4932,6 +4980,225 @@ function stageGo(k){
 }
 document.addEventListener('click', e=>{ const b = e.target.closest && e.target.closest('[data-stage]'); if(b){ e.preventDefault(); stageGo(b.getAttribute('data-stage')); } });
 
+
+/* ==== Rent Tax Credit for past years: calculator, claim sheet, letter for the RTB number ==== */
+/* Limits from Revenue (how much can you claim, published 1 January 2026) and the Finance Act 2022, s.13.
+   2027 and 2028 use the Budget 2027 figures; they only show from January 2027 and the monthly check covers them. */
+const RTC_CAP = {2022:[500,1000], 2023:[500,1000], 2024:[1000,2000], 2025:[1000,2000], 2026:[1000,2000], 2027:[1150,2300], 2028:[1150,2300]};
+const RTC_LINK = {
+  how:'https://www.revenue.ie/en/personal-tax-credits-reliefs-and-exemptions/land-and-property/rent-credit/how-to-claim.aspx',
+  cond:'https://www.revenue.ie/en/personal-tax-credits-reliefs-and-exemptions/land-and-property/rent-credit/qualifying-conditions.aspx',
+  four:'https://www.revenue.ie/en/personal-tax-credits-reliefs-and-exemptions/four-year-rule/index.aspx'
+};
+function rtcNow(){ const d = new Date(); return {y:d.getFullYear(), m:d.getMonth() + 1, utc:Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())}; }
+function rtcYears(){ const n = rtcNow().y, out = []; for(let y = Math.max(2022, n - 4); y <= Math.min(n, 2028); y++) out.push(y); return out; }
+function rtcDaysLeft(y){ return Math.round((Date.UTC(y + 4, 11, 31) - rtcNow().utc) / 86400000); }
+const RTC_GA_M = ['Eanáir','Feabhra','Márta','Aibreán','Bealtaine','Meitheamh','Iúil','Lúnasa','Meán Fómhair','Deireadh Fómhair','Samhain','Nollaig'];
+function rtcDate(){ const d = new Date(); return lang === 'ga' ? d.getDate()+' '+RTC_GA_M[d.getMonth()]+' '+d.getFullYear() : d.toLocaleDateString('en-IE',{day:'numeric',month:'long',year:'numeric'}); }
+function rtcDl(y){ return nt('31 December '+(y + 4), '31 Nollaig '+(y + 4)); }
+const rtcChk = id => { const e = document.getElementById(id); return !!(e && e.checked); };
+function rtcSel(id, label, opts, hint){
+  return '<div class="field"><label for="rp-'+id+'">'+ntEsc(label)+'</label><select id="rp-'+id+'">'+opts.map(o=>'<option value="'+o[0]+'">'+ntEsc(o[1])+'</option>').join('')+'</select>'+(hint ? '<div class="hint">'+ntEsc(hint)+'</div>' : '')+'</div>';
+}
+function rtcIn(id, label, hint, num){
+  return '<div class="field"><label for="rp-'+id+'">'+ntEsc(label)+'</label><input type="text" id="rp-'+id+'" autocomplete="off" maxlength="'+(num ? 9 : 120)+'"'+(num ? ' inputmode="decimal"' : '')+'>'+(hint ? '<div class="hint">'+ntEsc(hint)+'</div>' : '')+'</div>';
+}
+
+function renderRtcp(){
+  const root = document.getElementById('rtcpFields'); if(!root) return;
+  const keep = {}; root.querySelectorAll('input,select').forEach(i=>{ keep[i.id] = i.type === 'checkbox' ? i.checked : i.value; });
+  const N = rtcNow(), ys = rtcYears();
+  let h = '<div class="cols">';
+  h += rtcSel('joint', nt('Are you taxed jointly with a spouse or civil partner?','An ndéantar measúnú cánach ort i gcomhpháirt le céile nó le páirtí sibhialta?'), [['no',nt('No','Ní dhéantar')],['yes',nt('Yes','Déantar')]], nt('If you are, the limit is doubled and rent paid by either of you counts.','Má dhéantar, dúbláiltear an teorainn agus áirítear cíos a d’íoc ceachtar agaibh.'));
+  h += rtcSel('for', nt('What was the rent for?','Cad chuige a raibh an cíos?'), [['home',nt('Your own home','Do theach féin')],['second',nt('A second home you rent for work or college','Dara teach a bhfuil tú ar cíos ann don obair nó don choláiste')],['child',nt('Your child’s place while they are at college','Áit do linbh fad atá siad sa choláiste')]]);
+  h += rtcSel('ll', nt('Who is the landlord?','Cé hé an tiarna talún?'), [['private',nt('A private landlord or letting agent','Tiarna talún príobháideach nó gníomhaire ligin')],['council',nt('A council, or an Approved Housing Body (housing association)','Comhairle, nó Comhlacht Tithíochta Formheasta (cumann tithíochta)')],['parent',nt('Your parent or your child','Do thuismitheoir nó do leanbh')],['rel',nt('Another relative','Gaol eile')]]);
+  h += rtcSel('sup', nt('Did HAP, Rent Supplement or RAS pay any of the rent, or is it a Cost Rental home?','Ar íoc HAP, Forlíonadh Cíosa nó RAS aon chuid den chíos, nó an teach Cíos Costais é?'), [['no',nt('No','Níor íoc')],['some',nt('Yes, for some of the time','Íoc, ar feadh tamaill')],['yes',nt('Yes, the whole time','Íoc, an t-am ar fad')]], nt('Rent covered by these does not count, even if you paid a top-up.','Ní áirítear cíos a chlúdaigh siad seo, fiú má d’íoc tú breis air.'));
+  h += '</div>';
+  h += '<div style="margin:.4rem 0 .2rem;font-weight:600;color:var(--ink)">'+ntEsc(nt('Rent you paid each year','An cíos a d’íoc tú gach bliain'))+'</div>';
+  h += '<div class="rtcfill"><div class="field" style="margin:0;flex:1 1 11rem"><label for="rp-month">'+ntEsc(nt('Same rent every year? Your monthly rent (€)','An cíos céanna gach bliain? Do chíos míosúil (€)'))+'</label><input type="text" id="rp-month" inputmode="decimal" maxlength="7" autocomplete="off"></div><button type="button" class="secondary" id="rpFill">'+ntEsc(nt('Fill in each year','Líon isteach gach bliain'))+'</button></div>';
+  h += '<p class="hint" style="margin:.35rem 0 .5rem">'+ntEsc(nt('Then change any year that was different, or leave a year blank if you did not rent.','Ansin athraigh aon bhliain a bhí difriúil, nó fág bliain bán mura raibh tú ar cíos.'))+'</p>';
+  ys.forEach(y=>{
+    const cur = y === N.y, left = rtcDaysLeft(y), soon = !cur && left <= 60;
+    const chip = cur ? nt('This year, so far','An bhliain seo, go dtí seo') : nt('Claim by '+rtcDl(y), 'Éiligh faoi '+rtcDl(y)) + (soon ? nt(' · '+left+' days left', ' · '+left+' lá fágtha') : '');
+    h += '<div class="rtcy"><div class="rtcyh"><strong>'+y+'</strong><span class="rtcdl'+(soon ? ' soon' : '')+'">'+ntEsc(chip)+'</span></div><div class="rtcyi">'+
+      '<div class="field"><label for="rp-r'+y+'">'+ntEsc(cur ? nt('Rent paid so far this year (€)','Cíos íoctha go dtí seo i mbliana (€)') : nt('Rent you paid in '+y+' (€)','Cíos a d’íoc tú in '+y+' (€)'))+'</label><input type="text" id="rp-r'+y+'" inputmode="decimal" maxlength="9" autocomplete="off"></div>'+
+      '<div class="field rtctax"><label for="rp-t'+y+'">'+ntEsc(nt('Income tax you paid in '+y+' (€)','Cáin ioncaim a d’íoc tú in '+y+' (€)'))+'</label><input type="text" id="rp-t'+y+'" inputmode="decimal" maxlength="9" autocomplete="off"></div>'+
+      '<label class="chk"><input type="checkbox" id="rp-c'+y+'">'+ntEsc(nt('Already claimed','Éilithe cheana'))+'</label></div></div>';
+  });
+  h += '<div class="field" style="margin:.6rem 0 0"><label class="chk"><input type="checkbox" id="rp-taxon">'+ntEsc(nt('I did not pay much income tax in some years (add what I paid)','Níor íoc mé mórán cánach ioncaim i roinnt blianta (cuir isteach a d’íoc mé)'))+'</label><div class="hint">'+ntEsc(nt('The credit can only take back income tax you paid. USC and PRSI do not count. Your Statement of Liability in myAccount shows it.','Ní féidir leis an gcreidmheas ach cáin ioncaim a d’íoc tú a thabhairt ar ais. Ní áirítear USC ná PRSI. Taispeánann do Ráiteas Dliteanais in myAccount é.'))+'</div></div>';
+  h += '<details class="docs" style="margin:.8rem 0 0"><summary style="font-weight:600;color:var(--ink)">'+ntEsc(nt('Details for your claim sheet and letter (optional)','Sonraí do do bhileog éilimh agus do litir (roghnach)'))+'</summary><div class="cols" style="margin-top:.7rem">'+
+    rtcIn('name', nt('Your name','D’ainm')) + rtcIn('addr', nt('Address you rented (with Eircode)','An seoladh a raibh tú ar cíos ann (le hEircode)')) + rtcIn('lln', nt('Landlord or agent’s name','Ainm an tiarna talún nó an ghníomhaire')) + rtcIn('rtb', nt('RTB registration number, if you have it','Uimhir chláraithe an RTB, má tá sí agat'), nt('Digs and rent-a-room do not have one.','Níl ceann ag lóistín ná ag seomra ar cíos.')) +
+    '</div></details>';
+  root.innerHTML = h;
+  Object.keys(keep).forEach(id=>{ const e = document.getElementById(id); if(!e) return; if(e.type === 'checkbox') e.checked = keep[id]; else e.value = keep[id]; });
+  if(!Object.keys(keep).length && typeof profIsOn === 'function' && profIsOn()){ const p = profLoad(); const set = (id, v) => { const e = document.getElementById(id); if(e && !e.value && v) e.value = v; }; set('rp-name', [p.first, p.last].filter(Boolean).join(' ')); set('rp-addr', [p.addr1, p.addr2, p.addr3, p.eircode].filter(Boolean).join(', ')); }
+  if(!root.dataset.wired){ root.dataset.wired = '1'; root.addEventListener('input', rtcUpdate); root.addEventListener('change', e=>{ if(e.target && e.target.type === 'text') return; rtcUpdate(); }); root.addEventListener('click', e=>{ if(e.target && e.target.id === 'rpFill') rtcFill(); }); }
+  rtcUpdate();
+}
+function rtcFill(){
+  const m = grNum(gvv('rp-month')); if(!m) { const e = document.getElementById('rp-month'); if(e) e.focus(); return; }
+  const N = rtcNow(); rtcYears().forEach(y=>{ const e = document.getElementById('rp-r'+y); if(e) e.value = String(Math.round(m * (y === N.y ? N.m : 12))); });
+  rtcUpdate();
+}
+function rtcCalc(){
+  const v = k => gvv('rp-'+k), joint = v('joint') === 'yes', taxOn = rtcChk('rp-taxon');
+  const blocked = v('ll') === 'council' ? 'council' : v('ll') === 'parent' ? 'parent' : (v('ll') === 'rel' && v('for') === 'child') ? 'relchild' : v('sup') === 'yes' ? 'support' : '';
+  const rows = rtcYears().map(y=>{
+    const rent = grNum(v('r'+y)), done = rtcChk('rp-c'+y), cap = (RTC_CAP[y] || RTC_CAP[2028])[joint ? 1 : 0];
+    const tax = taxOn && v('t'+y) !== '' ? grNum(v('t'+y)) : null;
+    let amt = Math.min(rent * 0.2, cap), why = rent * 0.2 >= cap ? 'cap' : 'pct';
+    if(tax !== null && tax < amt){ amt = tax; why = 'tax'; }
+    if(done){ amt = 0; why = 'done'; }
+    return {y, rent, cap, done, tax, amt:Math.round(amt), why};
+  });
+  return {rows, total:rows.reduce((a, r)=>a + r.amt, 0), blocked, joint, for:v('for'), ll:v('ll'), sup:v('sup')};
+}
+function rtcNotes(c){
+  const n = [];
+  n.push(nt('This is an estimate. Revenue works out the exact amount from your tax record.','Meastachán é seo. Oibríonn Revenue amach an méid cruinn ó do thaifead cánach.'));
+  if(c.joint) n.push(nt('Rent paid by either of you counts, up to the couple limit.','Áirítear cíos a d’íoc ceachtar agaibh, suas le teorainn na lánúine.'));
+  else n.push(nt('If you share the rent with someone you are not taxed jointly with, each of you claims for the share you paid.','Má roinneann tú an cíos le duine nach ndéantar measúnú i gcomhpháirt leat, éilíonn gach duine agaibh as an sciar a d’íoc sibh.'));
+  if(c.for === 'child') n.push(nt('Your child must have been under 23 when their course started, and the course must be on the approved list for tuition fees relief. Digs and rent-a-room count. If you and the other parent are not taxed jointly, each of you can claim for what you paid.','Caithfidh go raibh do leanbh faoi 23 nuair a thosaigh a gcúrsa, agus caithfidh an cúrsa a bheith ar an liosta ceadaithe d’fhaoiseamh ar tháillí teagaisc. Áirítear lóistín agus seomra ar cíos. Mura ndéantar measúnú i gcomhpháirt ort féin agus ar an tuismitheoir eile, is féidir le gach duine agaibh éileamh as a d’íoc sibh.'));
+  if(c.for === 'second') n.push(nt('The second home must be in Ireland and rented so you can work or study.','Caithfidh an dara teach a bheith in Éirinn agus ar cíos ionas gur féidir leat obair nó staidéar a dhéanamh.'));
+  if(c.ll === 'rel' && c.for !== 'child') n.push(nt('Renting from a relative other than a parent or child counts only if the tenancy is registered with the RTB. A room in a relative’s own home (digs) does not count.','Ní áirítear cíos ó ghaol seachas tuismitheoir nó leanbh ach amháin má tá an tionóntacht cláraithe leis an RTB. Ní áirítear seomra i dteach gaoil féin (lóistín).'));
+  if(c.sup === 'some') n.push(nt('Leave out any rent that HAP, Rent Supplement or RAS paid towards.','Fág amach aon chíos ar íoc HAP, Forlíonadh Cíosa nó RAS ina threo.'));
+  n.push(nt('Revenue asks for the tenancy’s RTB registration number if it has one. Digs and rent-a-room do not need one. Where a tenancy has to be registered, the credit depends on it being registered. If you cannot find the number yet you can still claim, but Revenue may ask for it later.','Iarrann Revenue uimhir chláraithe RTB na tionóntachta má tá ceann aici. Ní theastaíonn ceann ó lóistín ná ó sheomra ar cíos. I gcás ina gcaithfear tionóntacht a chlárú, braitheann an creidmheas ar í a bheith cláraithe. Mura féidir leat an uimhir a aimsiú fós is féidir leat éileamh fós, ach d’fhéadfadh Revenue í a iarraidh níos déanaí.'));
+  n.push(nt('Keep your records, such as bank statements showing the rent and your tenancy agreement, in case Revenue asks for them.','Coinnigh do thaifid, mar ráitis bhainc a thaispeánann an cíos agus do chomhaontú tionóntachta, ar eagla go n-iarrfaidh Revenue iad.'));
+  return n;
+}
+function rtcSteps(c){
+  const N = rtcNow(), past = c.rows.filter(r=>r.y < N.y), cur = c.rows.find(r=>r.y === N.y);
+  const S = [];
+  if(past.length){
+    const span = past.length > 1 ? past[0].y + nt(' to ',' go ') + past[past.length - 1].y : String(past[0].y);
+    S.push(nt('For '+span+', in Revenue’s myAccount: go to PAYE Services and choose ‘Review your tax for the previous 4 years’. Request a Statement of Liability for the year, then choose ‘Complete your Income Tax Return’. On the Tax Credits & Reliefs page, choose ‘You and your family’, then ‘Rent Tax Credit’, fill it in and submit the return. Do this once for each year.',
+      'Do '+span+', in myAccount Revenue: téigh go PAYE Services agus roghnaigh ‘Review your tax for the previous 4 years’. Iarr Ráiteas Dliteanais don bhliain, ansin roghnaigh ‘Complete your Income Tax Return’. Ar an leathanach Tax Credits & Reliefs, roghnaigh ‘You and your family’, ansin ‘Rent Tax Credit’, líon isteach é agus cuir isteach an tuairisceán. Déan é seo uair amháin do gach bliain.'));
+  }
+  if(cur) S.push(nt('For '+cur.y+': in myAccount, go to PAYE Services, choose ‘Manage your tax '+cur.y+'’, then ‘Add new credits’, and claim the Rent Tax Credit under ‘You and your family’. You can also claim it in your '+cur.y+' tax return next year.',
+    'Do '+cur.y+': in myAccount, téigh go PAYE Services, roghnaigh ‘Manage your tax '+cur.y+'’, ansin ‘Add new credits’, agus éiligh an Creidmheas Cánach Cíosa faoi ‘You and your family’. Is féidir leat é a éileamh i do thuairisceán cánach '+cur.y+' an bhliain seo chugainn freisin.'));
+  S.push(nt('If you file a Form 11 through ROS, claim in the Rent Tax Credit section of each year’s return instead.','Má chomhdaíonn tú Foirm 11 trí ROS, éiligh i gcuid an Chreidmheasa Cánach Cíosa de thuairisceán gach bliana ina ionad.'));
+  return S;
+}
+function rtcUpdate(){
+  const out = document.getElementById('rtcpOut'); if(!out) return;
+  const taxOn = rtcChk('rp-taxon'); document.querySelectorAll('#rtcpFields .rtctax').forEach(e=>{ e.style.display = taxOn ? '' : 'none'; });
+  const c = rtcCalc(), N = rtcNow();
+  if(c.blocked){
+    const msg = {council:nt('Rent paid to a council or an Approved Housing Body does not qualify for the Rent Tax Credit.','Ní cháilíonn cíos a íoctar le comhairle nó le Comhlacht Tithíochta Formheasta don Chreidmheas Cánach Cíosa.'),
+      parent:nt('The Rent Tax Credit is not available when the landlord is your parent or your child.','Níl an Creidmheas Cánach Cíosa ar fáil nuair is é do thuismitheoir nó do leanbh an tiarna talún.'),
+      relchild:nt('For a child’s place at college, the credit is not available if the landlord is related to you or your child, including brothers, sisters, aunts, uncles, nieces and nephews.','Maidir le háit linbh sa choláiste, níl an creidmheas ar fáil má tá gaol ag an tiarna talún leat féin nó le do leanbh, deartháireacha, deirfiúracha, aintíní, uncailí, neachtanna agus nianna san áireamh.'),
+      support:nt('Rent paid with HAP, Rent Supplement or RAS, or for a Cost Rental home, does not qualify, even if you paid a top-up.','Ní cháilíonn cíos a íocadh le HAP, Forlíonadh Cíosa nó RAS, nó do theach Cíos Costais, fiú má d’íoc tú breis air.')}[c.blocked];
+    out.dataset.sig = ''; out.innerHTML = '<div class="result noga"><span class="tag no">'+ntEsc(nt('Does not qualify','Ní cháilíonn'))+'</span><h3>'+ntEsc(nt('This rent does not count','Ní áirítear an cíos seo'))+'</h3><p>'+ntEsc(msg)+'</p><p style="font-size:.9rem"><a href="'+RTC_LINK.cond+'" target="_blank" rel="noopener">'+ntEsc(nt('Revenue: who can claim →','Revenue: cé atá in ann éileamh →'))+'</a></p></div>';
+    return;
+  }
+  const typed = c.rows.some(r=>r.rent > 0 || r.done);
+  if(!typed){ out.dataset.sig = ''; out.innerHTML = '<p class="sub noga" style="font-size:.95rem">'+ntEsc(nt('Put in the rent you paid to see an estimate.','Cuir isteach an cíos a d’íoc tú chun meastachán a fheiceáil.'))+'</p>'; return; }
+  const line = r => {
+    if(r.done) return r.y+': '+nt('already claimed','éilithe cheana');
+    const a = eu(r.amt);
+    if(r.why === 'cap') return r.y+': '+a+' '+nt('(the most for '+r.y+')','(an méid is mó do '+r.y+')');
+    if(r.why === 'tax') return r.y+': '+a+' '+nt('(limited to the income tax you paid)','(teoranta don cháin ioncaim a d’íoc tú)');
+    return r.y+': '+a+' '+nt('(20% of '+eu(r.rent)+')','(20% de '+eu(r.rent)+')') + (r.y === N.y ? nt(', so far',', go dtí seo') : '');
+  };
+  const oldest = c.rows[0], urgent = oldest && oldest.y < N.y && oldest.amt > 0 && rtcDaysLeft(oldest.y) <= 120;
+  let h = '<div class="result noga"><span class="tag yes">'+ntEsc(nt('Estimate','Meastachán'))+'</span>';
+  h += '<h3>'+ntEsc(c.total ? nt('You could claim back about '+eu(c.total),'D’fhéadfá thart ar '+eu(c.total)+' a éileamh ar ais') : nt('Nothing left to claim for these years','Níl aon rud fágtha le héileamh do na blianta seo'))+'</h3>';
+  h += '<ul class="doclist">'+c.rows.filter(r=>r.rent > 0 || r.done).map(r=>'<li>'+ntEsc(line(r))+'</li>').join('')+'</ul>';
+  if(urgent) h += '<p class="rtcwarn">'+ntEsc(nt('Claims for '+oldest.y+' must reach Revenue by '+rtcDl(oldest.y)+'. That is '+rtcDaysLeft(oldest.y)+' days from today.','Caithfidh éilimh do '+oldest.y+' Revenue a bhaint amach faoi '+rtcDl(oldest.y)+'. Sin '+rtcDaysLeft(oldest.y)+' lá ón lá inniu.'))+'</p>';
+  h += '<div style="font-weight:600;color:var(--ink);margin:.8rem 0 .3rem">'+ntEsc(nt('How to claim','Conas éileamh'))+'</div><ol class="rtcsteps">'+rtcSteps(c).map(x=>'<li>'+ntEsc(x)+'</li>').join('')+'</ol>';
+  h += '<details class="docs"><summary>'+ntEsc(nt('Good to know','Is fiú a fhios a bheith agat'))+'</summary><ul class="doclist">'+rtcNotes(c).map(x=>'<li>'+ntEsc(x)+'</li>').join('')+'</ul></details>';
+  h += '<p style="font-size:.9rem;margin:.6rem 0 0"><a href="'+RTC_LINK.how+'" target="_blank" rel="noopener">'+ntEsc(nt('Revenue: how to claim →','Revenue: conas éileamh →'))+'</a> &nbsp; <a href="'+RTC_LINK.four+'" target="_blank" rel="noopener">'+ntEsc(nt('Revenue: the four-year rule →','Revenue: an riail cheithre bliana →'))+'</a></p>';
+  h += '<div class="sharebar" style="margin-top:.9rem"><button type="button" class="primary" id="rpSheet">'+ntEsc(nt('Make my claim sheet','Déan mo bhileog éilimh'))+'</button><button type="button" class="secondary" id="rpLetter">'+ntEsc(nt('Ask for the RTB number','Iarr uimhir an RTB'))+'</button>'+(urgent ? '<button type="button" class="secondary" id="rpCal">'+ntEsc(nt('Add a reminder to my calendar','Cuir meabhrúchán le m’fhéilire'))+'</button>' : '')+'</div><div id="rpDoc"></div></div>';
+  const shown = !!(document.getElementById('rpDoc') && document.getElementById('rpDoc').innerHTML);
+  if(out.dataset.sig === h && document.getElementById('rpSheet')){ if(shown){ if(rtcLastDoc === 'sheet') rtcShowSheet(); else if(rtcLastDoc === 'letter') rtcShowLetter(); } return; }
+  out.innerHTML = h; out.dataset.sig = h;
+  if(shown){ /* a sheet or letter was open: rebuild it so it matches the new figures */ if(rtcLastDoc === 'sheet') rtcShowSheet(); else if(rtcLastDoc === 'letter') rtcShowLetter(); }
+  rtcSay(c.total ? nt('Estimate: about '+eu(c.total),'Meastachán: thart ar '+eu(c.total)) : '');
+  document.getElementById('rpSheet').addEventListener('click', rtcShowSheet);
+  document.getElementById('rpLetter').addEventListener('click', rtcShowLetter);
+  const cal = document.getElementById('rpCal'); if(cal) cal.addEventListener('click', e=>{ const y = c.rows[0].y; grDl('rent-tax-credit-reminder.ics', rtcIcs(y), 'text/calendar', e.currentTarget); });
+}
+let rtcLastDoc = '', rtcSayT = 0;
+function rtcSay(t){ clearTimeout(rtcSayT); rtcSayT = setTimeout(()=>{ const e = document.getElementById('rtcLive'); if(e) e.textContent = t; }, 900); }
+function rtcSheetText(){
+  const c = rtcCalc(), v = k => gvv('rp-'+k), N = rtcNow();
+  const L = [nt('RENT TAX CREDIT FOR PAST YEARS: CLAIM SHEET','AN CREIDMHEAS CÁNACH CÍOSA DO BHLIANTA ROIMHE SEO: BILEOG ÉILIMH'), rtcDate(), ''];
+  const row = (l, x) => L.push(l + ': ' + (x || nt('(not filled in yet)','(gan líonadh fós)')));
+  row(nt('Your name','D’ainm'), v('name')); row(nt('Rented home','Teach ar cíos'), v('addr')); row(nt('Landlord or agent','Tiarna talún nó gníomhaire'), v('lln')); row(nt('RTB registration number','Uimhir chláraithe an RTB'), v('rtb'));
+  L.push('', nt('ESTIMATE (Revenue works out the exact amount)','MEASTACHÁN (oibríonn Revenue amach an méid cruinn)'));
+  c.rows.forEach(r=>{
+    if(!(r.rent > 0 || r.done)) return;
+    const dl = r.done ? '' : r.y < N.y ? nt(' (claim by '+rtcDl(r.y)+')',' (éiligh faoi '+rtcDl(r.y)+')') : nt(' (this year, so far)',' (an bhliain seo, go dtí seo)');
+    L.push('  ' + r.y + ': ' + (r.done ? nt('already claimed','éilithe cheana') : nt('rent ','cíos ') + eu(r.rent) + nt(', credit about ',', creidmheas thart ar ') + eu(r.amt)) + dl);
+  });
+  L.push('  ' + nt('Total: about ','Iomlán: thart ar ') + eu(c.total), '', nt('HOW TO CLAIM','CONAS ÉILEAMH'));
+  rtcSteps(c).forEach((x, i)=>L.push((i + 1) + '. ' + x));
+  L.push('', nt('GOOD TO KNOW','IS FIÚ A FHIOS A BHEITH AGAT'));
+  rtcNotes(c).forEach(x=>L.push('- ' + x));
+  L.push('', nt('Source: revenue.ie, Rent Tax Credit pages and the four-year rule. Made with nuvia.ie. Information only, not tax advice.','Foinse: revenue.ie, leathanaigh an Chreidmheasa Cánach Cíosa agus an riail cheithre bliana. Déanta le nuvia.ie. Eolas amháin, ní comhairle chánach.'));
+  return L.join('\n');
+}
+function rtcShowSheet(){
+  rtcLastDoc = 'sheet'; const text = rtcSheetText(), box = document.getElementById('rpDoc');
+  box.innerHTML = grTextOut(text, ['rpShDl','rpShCp']);
+  document.getElementById('rpShDl').addEventListener('click', e=>grDl('rent-tax-credit-claim-sheet.txt', text, 'text/plain', e.currentTarget));
+  document.getElementById('rpShCp').addEventListener('click', e=>grCopy(text, e.currentTarget));
+}
+function rtcLetterText(){
+  const v = k => gvv('rp-'+k), name = v('name') || '[Your name]', addr = v('addr') || '[the address you rent]';
+  return [name, v('addr') || '[Your address]', '', new Date().toLocaleDateString('en-IE',{day:'numeric',month:'long',year:'numeric'}), '',
+    'Dear ' + (v('lln') || 'Landlord') + ',', '',
+    'I am claiming the Rent Tax Credit from Revenue for the time I have rented ' + addr + ' from you. As part of the claim, Revenue asks for the tenancy’s RTB registration number.', '',
+    'Could you send me the registration number when you get a chance? It is on the confirmation the RTB sends when a tenancy is registered.', '',
+    'The claim is between me and Revenue and does not change anything about the tenancy.', '',
+    'Thank you for your help.', '', 'Yours sincerely,', '', name].join('\n');
+}
+function rtcShowLetter(){
+  rtcLastDoc = 'letter'; const text = rtcLetterText(), box = document.getElementById('rpDoc');
+  box.innerHTML = grTextOut(text, ['rpLtDl','rpLtCp']) + '<p class="sub" style="font-size:.9rem;margin-top:.6rem">'+ntEsc(nt('The letter is in English because landlords and Revenue deal in English most often. Edit it however you like.','Tá an litir i mBéarla mar is i mBéarla is minice a dhéileálann tiarnaí talún agus Revenue. Cuir in eagar í mar is mian leat.'))+'</p>';
+  document.getElementById('rpLtDl').addEventListener('click', e=>grDl('letter-rtb-number.txt', text, 'text/plain', e.currentTarget));
+  document.getElementById('rpLtCp').addEventListener('click', e=>grCopy(text, e.currentTarget));
+}
+function rtcIcs(y){
+  const esc = s => String(s).replace(/\\/g,'\\\\').replace(/;/g,'\\;').replace(/,/g,'\\,').replace(/\n/g,'\\n');
+  const N = rtcNow(), dl = Date.UTC(y + 4, 11, 31), pick = Math.max(N.utc + 86400000, dl - 14 * 86400000);
+  const d = new Date(pick).toISOString().slice(0,10).replace(/-/g,''), e = new Date(pick + 86400000).toISOString().slice(0,10).replace(/-/g,'');
+  const stamp = new Date().toISOString().replace(/[-:]/g,'').replace(/\.\d+Z$/,'Z');
+  return ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Nuvia//Rent Tax Credit//EN','CALSCALE:GREGORIAN','BEGIN:VEVENT','UID:nuvia-rtc-'+y+'@nuvia.ie','DTSTAMP:'+stamp,'DTSTART;VALUE=DATE:'+d,'DTEND;VALUE=DATE:'+e,
+    'SUMMARY:'+esc(nt('Claim the Rent Tax Credit for '+y,'Éiligh an Creidmheas Cánach Cíosa do '+y)),
+    'DESCRIPTION:'+esc(nt('Claims for '+y+' must reach Revenue by 31 December '+(y + 4)+'. In myAccount: PAYE Services, Review your tax for the previous 4 years.','Caithfidh éilimh do '+y+' Revenue a bhaint amach faoi 31 Nollaig '+(y + 4)+'. In myAccount: PAYE Services, Review your tax for the previous 4 years.')),
+    'BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:'+esc(nt('Claim the Rent Tax Credit for '+y,'Éiligh an Creidmheas Cánach Cíosa do '+y)),'TRIGGER:-P1D','END:VALARM','END:VEVENT','END:VCALENDAR'].join('\r\n') + '\r\n';
+}
+
+/* shown with the results for renters and first-time buyers */
+function setupRtcp(){
+  const on = state.situation === 'renting' || state.situation === 'buying';
+  grShow('rtcp', on); if(on) renderRtcp();
+}
+/* stand-alone page at nuvia.ie/#rtc */
+function rtcSolo(on){
+  if(!on) return;
+  const solo = document.getElementById('solo'), p = document.getElementById('rtcp'); if(!solo || !p) return;
+  ['progress','quiz','resultsWrap'].forEach(id=>{ const e = document.getElementById(id); if(e) e.style.display = 'none'; });
+  const hero = document.querySelector('main > header'); if(hero) hero.style.display = 'none';
+  document.getElementById('soloH').textContent = nt('Rent Tax Credit for past years','An Creidmheas Cánach Cíosa do bhlianta roimhe seo');
+  document.getElementById('soloBody').appendChild(p);
+  p.style.display = 'block'; p.style.marginTop = '0'; p.style.paddingTop = '0'; p.style.borderTop = 'none';
+  solo.style.display = 'block'; document.title = nt('Rent Tax Credit for past years','An Creidmheas Cánach Cíosa do bhlianta roimhe seo') + ' | Nuvia';
+  renderRtcp(); window.scrollTo(0, 0);
+}
+/* line on the home page, with the closing date for the oldest year */
+function rtcNote(){
+  const el = document.getElementById('rtcNoteDl'); if(!el) return;
+  const N = rtcNow(), y = Math.max(2022, N.y - 4);
+  el.textContent = N.m >= 9 && y < N.y ? nt(' Claims for '+y+' close on 31 December.',' Dúntar éilimh do '+y+' ar 31 Nollaig.') : '';
+}
+function rtcLang(){
+  rtcNote();
+  const s = document.getElementById('solo'); if(s && s.style.display === 'block'){ document.getElementById('soloH').textContent = nt('Rent Tax Credit for past years','An Creidmheas Cánach Cíosa do bhlianta roimhe seo'); }
+  const p = document.getElementById('rtcp'); if(p && p.style.display === 'block') renderRtcp();
+}
+
 /* ---- My details: save once, pre-fill everywhere (device only) ---- */
 const PROF_KEY = 'hn-profile', PROF_ON = 'hn-profile-on';
 const PROF_FIELDS = [
@@ -5265,6 +5532,8 @@ document.addEventListener('input', e=>{
 
 routeBannerInit();
 if(!tryRestoreFromLink()) showStep();
+try{ rtcNote(); if(location.hash === '#rtc') rtcSolo(true); }catch(e){}
+window.addEventListener('hashchange', ()=>{ try{ if(location.hash === '#rtc') rtcSolo(true); }catch(e){} });
 </script>
 </body>
 </html>
